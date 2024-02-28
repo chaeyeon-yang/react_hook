@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    let rootNode = document.getElementById("root");
+
+    const LogonContext = React.createContext();
+
+    ReactDOM.createRoot(rootNode).render(
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+    );
+
+    //부모컴포넌트의 함수를 자식컴포넌트에 전달하기 
+    //데이터는 위에서 아래로
+    //함수는 아래에서 위로 
+
+    function App() {
+      return (
+        <LogonProvider>
+          <div>
+            <Logon />
+            <Album />
+          </div>
+        </LogonProvider>
+      );
+    }
+
+    //데이터만 가지고 공유데이터 
+    function LogonProvider({ children }) {
+      const [logonId, setLogonId] = React.useState("");  //변수와 함수를 같이 제공한다 
+      const logon = (param) => {
+        setLogonId(param)
+      }
+      const logout = () => {
+        setLogonId("")
+      }
+      let value = { "logonId": logonId, "logon": logon, "logout": logout };
+      return (
+        <LogonContext.Provider value={value} >{children}</LogonContext.Provider>
+      );
+    }
+
+
+    function Logon() {
+      const [userid, setUserid] = React.useState("");
+
+      let value = React.useContext(LogonContext);
+      const { logonId, logon, logout } = value; //JSON 해체: destruct
+      let onChange = (e) => {
+        setUserid(e.target.value);
+        console.log(userid);
+      }
+
+      return (
+        <div>
+          <h1>
+            현재 로그온아이디 {logonId}
+          </h1>
+          아이디 : <input type="text" id="userid" onChange={onChange} value={userid} /><br />
+          <button type="button" onClick={() => logon(userid)}>로그온</button>
+        </div>)
+        ;
+    }
+
+    function Album() {
+      let value = React.useContext(LogonContext);
+      let { logonId, logon, logout } = value;
+
+      return <h1>{logonId}</h1>;
+    }
+
+  </script>
+
+</body>
+
+</html>

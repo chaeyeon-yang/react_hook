@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- 컨텍스트에 값도주고 이값을 업데이트 하는 함수도 같이제공
+    ContextProvider를 새로 만들기 
+    시스템이 제공하는 Provider는 값넣기만 가능하다. 
+    불멸의 카운터를 제공하는 Provider를 만들자 
+    -->
+  <script type="text/babel">
+    let root = document.getElementById('root');
+    let CounterContext = React.createContext('default');
+    //CouterContext.Provider를 제공해주는데 값만 설정 */
+    ReactDOM.createRoot(root).render(
+      <div>
+        <App />
+      </div>
+    );
+
+    //새로운 프로바이더를 하나 만든다 
+    //함수원형이 정해져있고 리액트가 이런식으로 재정의 하라고 만들어준 예제
+    function CounterProvider({ children }) {
+      /*
+      <MyContext.Provider value={{userid:"test", username:"홍길동"}}>
+          <GrandParent/>
+      </MyContext.Provider> 
+      */
+      //함수니까 스태이트도 둘 수 있고 내부 함수도 만들 수 있다. 
+      const [count, setCount] = React.useState(0);
+      const increase = () => { setCount(count + 1) }
+      const decrease = () => { setCount(count - 1) }
+
+      //count와 함수2개를 전달한다 
+      const value = {
+        "count": count,
+        "increase": increase,
+        "decrease": decrease
+      };
+      //중요사항: return 바로뒤에 ( 가 있어야 오류가 안남 
+      //당황 
+      return (
+        <CounterContext.Provider value={value}>
+          {children}
+        </CounterContext.Provider>
+      );
+    }
+
+
+
+    function App() {
+      return (
+        <div>
+          <h1>App</h1>
+          <CounterProvider>
+            <Child1 />
+          </CounterProvider>
+        </div>
+      )
+    }
+
+    function Child1() {
+      let value = React.useContext(CounterContext);
+      return (
+        <div>
+          <h1>Child1</h1>
+          <h3>현재 카운트 : {value.count}</h3>
+          <Child2 />
+        </div>
+      )
+    }
+
+    function Child2() {
+      let value = React.useContext(CounterContext);
+      return (
+        <div>
+          <button type="button" onClick={value.increase}>증가</button>
+          <button type="button" onClick={value.decrease}>감소</button>
+        </div>
+      )
+    }
+
+  </script>
+</body>
+
+</html>

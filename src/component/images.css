@@ -1,0 +1,11 @@
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-gap: 10px;
+}
+
+/* img-grid 클래스를 만들었음 */
+.img-grid img {
+    width: 100%; /* width가 줄어드는 비율로 height도 설정해라 */
+    height: auto;
+}
